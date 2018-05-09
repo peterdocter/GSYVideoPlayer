@@ -1,6 +1,6 @@
 ## GSYVideoPlayer 问题集锦
 
-#### 0、依赖不成功的，记得在project下的build.gradle文件jitpack的依赖。
+#### 0、依赖不成功的，如果是jitpach的依赖，记得在project下的build.gradle文件jitpack的依赖。
 ```
 allprojects {
 	repositories {
@@ -71,7 +71,7 @@ sourceSets {
 
 　是否监听了列表滑动了，在监听里更新了列表之类的。
 
-#### 4、目前不支持3gp或者mepg。
+#### 4、普通模式不支持3gp或者mepg，mepg可使用ex-so依赖。
 
 如果拍摄的视频播放不了，可以尝试用使用系统录制的项目：[VideoRecord](https://github.com/CarGuo/VideoRecord)
 或者使用JAVACV录制的项目：[FFmpegRecorder](https://github.com/CrazyOrr/FFmpegRecorder )，测试视频是否可以播放。
@@ -90,7 +90,14 @@ setUp(String url, boolean cacheWithPlay····)
 
 ```
 
-#### 6、为什么拖动视屏会弹回来，因为ijk的FFMPEG对关键帧问题，目前无解。
+#### 6、为什么拖动视屏会弹回来，因为ijk的FFMPEG对关键帧问题。
+可以尝试以下设置
+```
+VideoOptionModel videoOptionModel = new VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "enable-accurate-seek", 1);
+List<VideoOptionModel> list = new ArrayList<>();
+list.add(videoOptionModel);
+GSYVideoManager.instance().setOptionModelList(list);
+```
 
 #### 7、视频旋转后重新开始，配置AndroidManifest.xml。
 ```
@@ -113,8 +120,9 @@ setUp(String url, boolean cacheWithPlay····)
 [分片播放资料](http://www.jianshu.com/p/ea794a357b48)
 
 #### 11、有画面没声音，有声音没画面。
-这种情况一般都是so里没有打包支持的格式，如果需要支持你想要的格式，可以自己重新编译so，在module配置文件加上需要额外支持的格式。github首页有编译教程。
+1、这种情况一般都是so里没有打包支持的格式，如果需要支持你想要的格式，可以自己重新编译so，在module配置文件加上需要额外支持的格式。github首页有编译教程。
 
+[2、某些时候，TextureView需要开启硬件加速](https://github.com/CarGuo/GSYVideoPlayer/issues/266)
 
 #### 12、视频声音画面不同步。
 
@@ -140,3 +148,101 @@ GSYVideoManager.instance().setOptionModelList(list);
 
 对于如http://xxxxxxx.中文.mp4的url，如果出现 http 400 error的情况，请自行转换中文url到url编码；
 如 http://tool.oschina.net/encode?type=4 这里转化。
+
+
+#### 14、rtsp播放失败问题
+
+https://github.com/CarGuo/GSYVideoPlayer/issues/232
+
+https://github.com/CarGuo/GSYVideoPlayer/issues/207
+
+
+#### 15、m3u8拖动seek之后，加载很长时间
+
+https://github.com/Bilibili/ijkplayer/issues/2874
+
+https://github.com/CarGuo/GSYVideoPlayer/issues/252
+
+#### 16、播放本地m3u8有问题
+
+```
+VideoOptionModel videoOptionModel =
+        new VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "protocol_whitelist", crypto,file,http,https,tcp,tls,udp);
+List<VideoOptionModel> list = new ArrayList<>();
+list.add(videoOptionModel);
+GSYVideoManager.instance().setOptionModelList(list);
+```
+#### 17、rtsp连接有问题
+
+```
+VideoOptionModel videoOptionModel = new VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "rtsp_transport", "tcp");
+List<VideoOptionModel> list = new ArrayList<>();
+list.add(videoOphtionModel);
+GSYVideoManager.instance().setOptionModelList(list);
+```
+
+#### 18、url切换400（http与https域名共用）
+
+```
+VideoOptionModel videoOptionModel =
+                new VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "dns_cache_clear", 1);
+        List<VideoOptionModel> list = new ArrayList<>();
+        list.add(videoOptionModel);
+        GSYVideoManager.instance().setOptionModelList(list);
+```
+
+#### 19、全屏与非全屏的同步问题
+
+有一些自定义操作，需要全屏与非全屏切换之间做同步处理，具体操作是重载下面两个方法，实现自己的自定义操作，详细可参考demo。
+外部获取当前播放器，推荐使用`play.getCurPlay().xxxxxx`
+```
+/**
+ * 全屏时将对应处理参数逻辑赋给全屏播放器
+ *
+ * @param context
+ * @param actionBar
+ * @param statusBar
+ * @return
+ */
+@Override
+public GSYBaseVideoPlayer startWindowFullscreen(Context context, boolean actionBar, boolean statusBar) {
+    SmartPickVideo sampleVideo = (SmartPickVideo) super.startWindowFullscreen(context, actionBar, statusBar);
+    sampleVideo.mSourcePosition = mSourcePosition;
+    sampleVideo.mType = mType;
+    sampleVideo.mUrlList = mUrlList;
+    sampleVideo.mTypeText = mTypeText;
+    sampleVideo.mSwitchSize.setText(mTypeText);
+    return sampleVideo;
+}
+
+/**
+ * 推出全屏时将对应处理参数逻辑返回给非播放器
+ *
+ * @param oldF
+ * @param vp
+ * @param gsyVideoPlayer
+ */
+@Override
+protected void resolveNormalVideoShow(View oldF, ViewGroup vp, GSYVideoPlayer gsyVideoPlayer) {
+    super.resolveNormalVideoShow(oldF, vp, gsyVideoPlayer);
+    if (gsyVideoPlayer != null) {
+        SmartPickVideo sampleVideo = (SmartPickVideo) gsyVideoPlayer;
+        mSourcePosition = sampleVideo.mSourcePosition;
+        mType = sampleVideo.mType;
+        mTypeText = sampleVideo.mTypeText;
+        mSwitchSize.setText(mTypeText);
+        setUp(mUrlList, mCache, mCachePath, mTitle);
+    }
+}
+```
+
+#### 20、精准的某个时间开始播放
+
+注意，这个是全局地设置，设置之后如果不需要需要清除这个item。
+```
+VideoOptionModel videoOptionModel =
+                new VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "seek-at-start", startPosition);
+        List<VideoOptionModel> list = new ArrayList<>();
+        list.add(videoOptionModel);
+        GSYVideoManager.instance().setOptionModelList(list);
+```

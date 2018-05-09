@@ -1,8 +1,339 @@
 ## 下方个版本说明，可以当做简单的wiki使用~，效果可参考DEMO。
 
-### 1.6.5(未发布)
+### 4.1.2(2018-04-14)
+* 修复已知问题。
+* 增加ijkplayer的raw播放支持。
+```
+String url = "android.resource://" + getPackageName() + "/" + R.raw.test;
+GSYVideoManager.instance().enableRawPlay(getApplicationContext());
+```
+* danmku分支提供网络弹幕demo
+
+### 4.1.1 (2018-04-01)
+* 1、update support lib to 26.0.2
+* 2、修复了渲染层在某些条件下，截图时返回大小不对问题。
+* 3、一些细节的优化处理。
+* 4、增加Manager的isFullState方法
+```
+ /*
+  * 当前是否全屏状态
+  *
+  * @return 当前是否全屏状态， true代表是。
+  */
+ public static boolean isFullState(Activity activity)
+```
+
+### 4.1.0 (2018-02-26)
+* 1、update to ijk 0.8.8
+* 2、去除cache模块的log库依赖
+* 3、去除exo模块的无用依赖
+* 4、增加恢复播放方法参数
+```
+ XXXXManager相关
+/**
+  * 恢复暂停状态
+  *
+  * @param seek 是否产生seek动作,直播设置为false
+  */
+ public static void onResume(String key, boolean seek)
+
+ Video相关
+ /**
+  * 恢复暂停状态
+  *
+  * @param seek 是否产生seek动作
+  */
+ @Override
+ public void onVideoResume(boolean seek)
+
+```
+
+### 4.0.0-beat1（2018-02-06）
+* 1、新增简单片头广告支持。
+`GSYSampleADVideoPlayer 与 DetailADPlayer`
+* 2、优化了ListGSYVideoPlayer、增加`playNext()`接口。
+* 3、优化代码结构，调整部分API接口（稍微调整下，偶尔有和旧版本不兼容的，参考源码和demo修改下方法名即可）。
+* 4、增加GSYVideoHelper视频帮助类，更加节省资源。
+* 5、增加GSYSampleCallBack节省继承，优化GSYVideoProgressListener的回调。
+* 6、增加GSYVideoViewBridge、重载`getGSYVideoManager()`方法实现自己的Manager。
+* 7、支持自定义渲染层，demo中`CustomRenderVideoPlayer`演示如何设置自定义渲染层。
+* 8、`ListMultiVideoActivity`和`MultiSampleVideo`演示如何同时播放多个视频。
+* 9、`DetailADPlayer2`和`ListADVideoActivity`演示广告与中间插入广告支持。
+* 10、增加音频焦点方法。
+```
+/**
+  * 长时间失去音频焦点，暂停播放器
+  *
+  * @param releaseWhenLossAudio 默认true，false的时候只会暂停
+  */
+ public void setReleaseWhenLossAudio(boolean releaseWhenLossAudio)
+
+```
+
+
+### 3.0.0（2018-01-14）
+
+1、增肌PlayerManager，更新为ExoPlayer2，优化对ExoPlayer2的支持。
+
+2、增加系统播放器AndroidMediaPlayer支持
+
+3、增对列表增加setUpLazy方法，优化列表中可能的滑动卡顿
+```
+    /**
+     * 在点击播放的时候才进行真正setup
+     */
+    public boolean setUpLazy(String url, boolean cacheWithPlay, File cachePath, Map<String, String> mapHeadData, String title)
+
+```
+4、优化GL渲染和处理切换渲染效果崩溃。
+
+
+
+5、DEMO增加SamllVideoHelper实现小窗口逻辑，更新demo
+
+
+
+6、优化触摸的音量、亮度、进度的弹出框，优化可自定义程度
+```
+    /**
+     * 触摸进度dialog的layoutId
+     * 继承后重写可返回自定义
+     * 有自定义的实现逻辑可重载showProgressDialog方法
+     */
+    protected int getProgressDialogLayoutId()
+    /**
+     * 触摸进度dialog的进度条id
+     * 继承后重写可返回自定义，如果没有可返回空
+     * 有自定义的实现逻辑可重载showProgressDialog方法
+     */
+    protected int getProgressDialogProgressId()
+
+    /**
+     * 触摸进度dialog的当前时间文本
+     * 继承后重写可返回自定义，如果没有可返回空
+     * 有自定义的实现逻辑可重载showProgressDialog方法
+     */
+    protected int getProgressDialogCurrentDurationTextId()
+
+    /**
+     * 触摸进度dialog全部时间文本
+     * 继承后重写可返回自定义，如果没有可返回空
+     * 有自定义的实现逻辑可重载showProgressDialog方法
+     */
+    protected int getProgressDialogAllDurationTextId()
+
+    /**
+     * 触摸进度dialog的图片id
+     * 继承后重写可返回自定义，如果没有可返回空
+     * 有自定义的实现逻辑可重载showProgressDialog方法
+     */
+    protected int getProgressDialogImageId()
+
+    /**
+     * 音量dialog的layoutId
+     * 继承后重写可返回自定义
+     * 有自定义的实现逻辑可重载showVolumeDialog方法
+     */
+    protected int getVolumeLayoutId()
+    /**
+     * 音量dialog的百分比进度条 id
+     * 继承后重写可返回自定义，如果没有可返回空
+     * 有自定义的实现逻辑可重载showVolumeDialog方法
+     */
+    protected int getVolumeProgressId()
+
+    /**
+     * 亮度dialog的layoutId
+     * 继承后重写可返回自定义
+     * 有自定义的实现逻辑可重载showBrightnessDialog方法
+     */
+    protected int getBrightnessLayoutId()
+
+    /**
+     * 亮度dialog的百分比text id
+     * 继承后重写可返回自定义，如果没有可返回空
+     * 有自定义的实现逻辑可重载showBrightnessDialog方法
+     */
+    protected int getBrightnessTextId()
+
+```
+
+
+### 2.1.3（2017-12-24）
+* update demo gradle to 4.1
+* 增加对CollapsingToolbarLayout的支持与demo
+* 多窗体下（包括桌面）的小窗口播放（WindowActivity）。
+* 增加播放进度回调
+```
+/**
+ * 进度回调
+ */
+public void setGSYVideoProgressListener(GSYVideoProgressListener videoProgressListener)
+```
+
+### 2.1.2(2017-12-08)
+* 增加针对Prepared之前调用OnVideoPause的处理
+* 背景视频模糊铺满，前方视频正常播放
+```
+DetailFilterActivity中注释的
+//高斯拉伸视频铺满背景，替换黑色，前台正常比例播放
+```
+
+
+### 2.1.1(2017-10-29)
+* videoCache模式支持增加header
+* 增加无缝切换视频DEMO SmartPickVideo
+* 调整部分代码路径，优化代码
+* log输入等级接口
+```
+GSYVideoManager.instance().setLogLevel(IjkMediaPlayer.IJK_LOG_SILENT);
+```
+
+### 2.1.0(2017-10-10)
+* 增加了视频帧合成gif功能（DEMO DetailControlActivity中）。
+* update ijkplayer 0.84
+
+### 2.0.9(2017-10-02)
+* 增加顶层效果渲染的动画效果。
+* 增加截图功能。
+* 增加自定义render支持。
+* 增加水印、多重播放等。
+
+
+### 2.0.8（2017-09-17）
+* 增加GSYBaseActivityDetail抽象类，方便detail模式集成。
+* 内部增加一些优化。
+* 增加简单滤镜功能支持。
+```
+1、全局设置
+GSYVideoType.setRenderType(GSYVideoType.GLSURFACE);
+2、设置滤镜
+player.setEffectFilter(new BarrelBlurEffect());
+```
+
+
+### 2.0.7(2017-09-13）
+
+* 优化增加了断网自动续连，需要为http前加上 "ijkhttphook:http://ssss"
+* update ijk to 0.8.3
+* 增加了demo中seekto精准定位，解决某些视频seek之后从头播放
+
+### 2.0.6(2017-08-31)
+* 调整了返回按键显示的问题。
+* 修改了全屏可能出现缓冲不消失问题。
+* 优化了双击问题。
+
+### 2.0.5(2017-08-26)
+* 增加双击暂停开始。
+* 增加了SurfaceView的支持:GSYVideoType.setRenderType(GSYVideoType.SUFRACE)。
+* 优化了触摸问题、内存问题、dismisstime问题。
+
+### 2.0.4(2017-08-08)
+* 增加了空播放ui支持。
+* 调整了GSYVideoOptionBuilder。
+* 修改了已知问题。
+* 增加了播放中调整播放速度接口。
+```
+public void setSpeedPlaying(float speed, boolean soundTouch) 
+```
+
+### 2.0.3(2017-08-06)
+* update ijk to 0.8.2
+* fix rtsp 播放问题
+* fix 小窗口播放问题
+* 调整了部分代码逻辑与结构。
+
+### 2.0.2(2017-07-16)
+* 完美实现播放、暂停、前后台切换、画面调整等情况不黑屏不突变，删除coverImageView类。
+* 增加了6.0下变调不变速接口
+* update ijkPlayer to 0.8.1
+
+### 2.0.1(2017-07-11)
+* 优化了TextureView显示
+* 修复SampleView的暂停问题
+
+
+### 2.0.0(2017-07-10)
+* 项目结构调整，增加了新的so支持。
+
+### 1.6.9(2017-07-08)
+
+* 修改setup的设置参数。
+* 升级修改所有回调接口，回调接口中返回当前播放器。
+* 修正播放本地文件错误，会错删文件问题。
+* 兼容Appbar中使用，感谢[@loveRose](https://github.com/loveRose)
+* 非全屏播放器可获取全屏播放器对象。
+```
+/**
+ * 获取全屏播放器对象
+ *
+ * @return GSYVideoPlayer 如果没有则返回空。
+ */
+public GSYVideoPlayer getFullWindowPlayer()
+```
+
+### 1.6.8(2017-06-27)
+* fix listVideoUtils title错乱问题
+* fix setSpeed无法重置的问题 
+* fix 切换网络无法继续播放问题
+* 增加旋转使能后是否跟随系统设置
+```
+/**
+ * 是否跟随系统旋转，false的话，系统禁止旋转也会跟着旋转
+ * @param rotateWithSystem 默认true
+ */
+public void setRotateWithSystem(boolean rotateWithSystem)
+```
+
+### 1.6.7(2017-06-16)
+* fix bug #265，全屏按返回按键之后的虚拟按键显示问题
+* so编译配置增加protocol crypto
+* 增加设置触摸显示控制ui的消失时间接口 
+```
+StandardGSYVideoPlayer.java
+/**
+ * 设置触摸显示控制ui的消失时间
+ * @param dismissControlTime 毫秒，默认2500
+ */
+public void setDismissControlTime(int dismissControlTime)
+```
+* 调整触摸滑动快进的比例
+```
+/**
+ * 调整触摸滑动快进的比例
+ * @param seekRatio 滑动快进的比例，默认1。数值越大，滑动的产生的seek越小
+ */
+public void setSeekRatio(float seekRatio) 
+```
+* 增加了拉伸填充的配置
+```
+GSYVideoType.java
+//全屏拉伸显示，使用这个属性时，surface_container建议使用FrameLayout
+public final static int SCREEN_MATCH_FULL = -4;
+```
+
+### 1.6.6(2017-05-24)
+* update ijkplayer to 0.8.0
+* update videocache to 2.7.0
+
+### 1.6.5(2017-05-05)
+* 增加镜像旋转demo SampleVideo
 * 修改了循环播放的UI问题
 * 修改了本地文件或者已缓存文件，显示进度问题 
+* 修复了横竖屏的问题
+* GSYVideoType增加SCREEN_TYPE_FULL类型，通过按照比例裁减放大视频，达到全屏
+* 增加setShowPauseCover接口
+
+```
+/**
+ * 是否需要加载显示暂停的cover图片
+ * 打开状态下，暂停退到后台，再回到前台不会显示黑屏，但可以对某些机型有概率出现OOM
+ * 关闭情况下，暂停退到后台，再回到前台显示黑屏
+ *
+ * @param showPauseCover 默认true
+ */
+public void setShowPauseCover(boolean showPauseCover)
+```
 
 ### 1.6.4(2017-04-20)
 * update ijk to 0.7.9 (增加了soundTouch，调速后声音变调问题得到解决)

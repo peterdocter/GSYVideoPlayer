@@ -1,26 +1,20 @@
 package com.example.gsyvideoplayer.fragment;
 
 
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.transition.Explode;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 
 import com.example.gsyvideoplayer.R;
-import com.example.gsyvideoplayer.adapter.ListNormalAdapter;
 import com.example.gsyvideoplayer.adapter.RecyclerBaseAdapter;
 import com.example.gsyvideoplayer.adapter.RecyclerNormalAdapter;
 import com.example.gsyvideoplayer.holder.RecyclerItemNormalHolder;
 import com.example.gsyvideoplayer.model.VideoModel;
 import com.shuyu.gsyvideoplayer.GSYVideoManager;
-import com.shuyu.gsyvideoplayer.GSYVideoPlayer;
-import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +33,7 @@ public class VideoFragment extends Fragment {
     RecyclerBaseAdapter recyclerBaseAdapter;
 
     List<VideoModel> dataList = new ArrayList<>();
+
 
     public VideoFragment() {
         // Required empty public constructor
@@ -87,10 +82,11 @@ public class VideoFragment extends Fragment {
                     //对应的播放列表TAG
                     if (GSYVideoManager.instance().getPlayTag().equals(RecyclerItemNormalHolder.TAG)
                             && (position < firstVisibleItem || position > lastVisibleItem)) {
-
                         //如果滑出去了上面和下面就是否，和今日头条一样
-                        GSYVideoPlayer.releaseAllVideos();
-                        recyclerNormalAdapter.notifyDataSetChanged();
+                        if(!GSYVideoManager.isFullState(getActivity())) {
+                            GSYVideoManager.releaseAllVideos();
+                            recyclerNormalAdapter.notifyDataSetChanged();
+                        }
                     }
                 }
             }
@@ -100,7 +96,7 @@ public class VideoFragment extends Fragment {
     }
 
     public boolean onBackPressed() {
-        if (StandardGSYVideoPlayer.backFromWindowFull(getActivity())) {
+        if (GSYVideoManager.backFromWindowFull(getActivity())) {
             return true;
         }
         return false;
@@ -121,7 +117,7 @@ public class VideoFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        GSYVideoPlayer.releaseAllVideos();
+        GSYVideoManager.releaseAllVideos();
     }
 
 
